@@ -137,13 +137,44 @@ curl -X POST http://127.0.0.1:5000/api/vigenere \
 
 ---
 
-## ☁️ Deploy ke Heroku
+## ☁️ Deploy Gratis (rekomendasi)
+
+> ⚠️ **Heroku tidak lagi gratis** sejak Nov 2022 — butuh dyno berbayar + kartu kredit.
+> **Hugging Face Docker Spaces juga sudah berbayar** (per 2025). Yang masih gratis:
+
+### 🥇 Render — Free Web Service
+
+Repo ini sudah punya **`render.yaml`** (Blueprint) → tinggal:
+
+1. Buka <https://dashboard.render.com/blueprints>
+2. **New Blueprint Instance** → connect repo GitHub `crypto-web`
+3. Render membaca `render.yaml` (plan `free`, region Singapore) → **Deploy**
+
+Manual juga bisa: **New → Web Service** →
+- Build: `pip install -r requirements.txt`
+- Start: `gunicorn app:app --bind 0.0.0.0:$PORT --workers 2 --timeout 60`
+
+> Free tier Render tidur setelah idle, tapi **bangun otomatis** saat diakses (cold start ±30–60 dtk).
+
+### Alternatif gratis lain
+
+| Platform | Catatan |
+|----------|---------|
+| **Railway** | Trial credit, deteksi Procfile otomatis |
+| **Fly.io** | `fly launch` → Python; butuh kartu (tanpa charge selama free allowance) |
+| **Cloudflare Quick Tunnel** | Tanpa akun, tapi URL hanya hidup selama server lokal jalan |
+
+Untuk semua platform, pastikan **`frontend/dist` sudah di-build** (sudah di-commit di repo ini).
+
+---
+
+## ☁️ Deploy ke Heroku (berbayar)
 
 Repo ini sudah **Heroku-ready**: `Procfile`, `requirements.txt`, `runtime.txt`, dan
 `frontend/dist` yang sudah di-build.
 
 ```bash
-# butuh Heroku CLI & akun berbayar
+# butuh Heroku CLI & akun berbayar — LIHAT bagian "Deploy Gratis" di atas
 heroku login
 heroku create nama-app-kamu
 
