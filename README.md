@@ -1,124 +1,105 @@
-# 🔐 Crypto Lab — Visualisasi 5 Algoritma Cipher Klasik
+# Crypto Lab
 
-Web interaktif untuk **mengenkripsi & mendekripsi** serta **memvisualisasikan langkah demi langkah** lima algoritma cipher klasik:
+Aplikasi web untuk mengenkripsi dan mendekripsi teks serta memvisualisasikan lima
+algoritma cipher klasik secara langkah demi langkah.
 
-| # | Algoritma | Keluarga | Kunci |
-|---|-----------|----------|-------|
-| 1 | **Caesar** | Substitusi monoalfabetik | Geseran angka (0–25) |
-| 2 | **Vigenère** | Substitusi polialfabetik | Kata kunci |
-| 3 | **Columnar Transposition** | Transposisi | Kata kunci |
-| 4 | **Playfair** | Substitusi digraf (matriks 5×5) | Kata kunci |
-| 5 | **Keyword Substitution** | Substitusi monoalfabetik | Kata kunci |
+| Algoritma | Keluarga | Kunci |
+|-----------|----------|-------|
+| Caesar | Substitusi monoalfabetik | Geseran angka (0–25) |
+| Vigenère | Substitusi polialfabetik | Kata kunci |
+| Columnar Transposition | Transposisi | Kata kunci |
+| Playfair | Substitusi digraf (matriks 5×5) | Kata kunci |
+| Keyword Substitution | Substitusi monoalfabetik | Kata kunci |
 
-> **Inti proyek:** seluruh *logika algoritma* ditulis di **Python** (`algorithms/`).
-> Frontend **Svelte 5** hanya menangani tampilan & visualisasi, dan memanggil logika
-> lewat API. Jadi tidak ada duplikasi algoritma di JavaScript.
+Seluruh logika algoritma ditulis di Python (`algorithms/`). Frontend Svelte 5 hanya
+menangani tampilan dan visualisasi, lalu memanggil logika tersebut lewat API — tidak ada
+duplikasi algoritma di sisi JavaScript.
 
----
-
-## 🏗️ Arsitektur
+## Arsitektur
 
 ```
-┌─────────────────────────┐        HTTP/JSON        ┌──────────────────────────┐
-│  Browser                │  ───────────────────▶   │  Flask (Python)          │
-│  Svelte 5 + Vite        │   POST /api/<cipher>    │  app.py                  │
-│  UI + Visualisasi       │  ◀───────────────────   │  algorithms/*.py         │
-└─────────────────────────┘   langkah + hasil (JSON) └──────────────────────────┘
+Browser (Svelte 5)          HTTP/JSON               Flask (Python)
+UI + visualisasi      ──── POST /api/<cipher> ────  app.py
+                      ◀──── langkah + hasil ─────  algorithms/*.py
 ```
 
-- Python mengembalikan **data langkah** (indeks, aturan, matriks, dsb.) → UI merendernya
-  menjadi tabel/animasi. Visualisasi **tidak** dihitung ulang di JS.
+Python mengembalikan data langkah (indeks, aturan, matriks, dan seterusnya). UI cukup
+merendernya menjadi tabel atau animasi; perhitungan visualisasi tidak diulang di JS.
 
----
-
-## 📁 Struktur Direktori
+## Struktur direktori
 
 ```
 crypto-web/
-├── algorithms/                 # ← INTI: logika cipher (Python murni, tanpa dependensi)
-│   ├── common.py               #   fungsi bersama (ALPHABET, pembersih teks, dll.)
-│   ├── caesar.py               #   1. Caesar
-│   ├── vigenere.py             #   2. Vigenère (+ Tabula Recta)
-│   ├── transposition.py        #   3. Columnar Transposition
-│   ├── playfair.py             #   4. Playfair (matriks 5×5)
-│   ├── substitution.py         #   5. Keyword Substitution
-│   └── _selftest.py            #   uji round-trip cepat (encrypt → decrypt)
-│
-├── app.py                      # Flask: API + menyajikan UI hasil build
-├── requirements.txt            # dependensi Python (Flask, gunicorn)
-├── Procfile                    # perintah start untuk Heroku
-├── runtime.txt                 # versi Python untuk Heroku
-│
-└── frontend/                   # ← UI: Svelte 5 + Vite + Tailwind CSS
+├── algorithms/                 logika cipher (Python murni, tanpa dependensi)
+│   ├── common.py               fungsi bersama (alfabet, pembersih teks)
+│   ├── caesar.py
+│   ├── vigenere.py             termasuk Tabula Recta
+│   ├── transposition.py        columnar transposition
+│   ├── playfair.py             matriks 5×5
+│   ├── substitution.py         keyword substitution
+│   └── _selftest.py            uji round-trip cepat
+├── app.py                      Flask: API + menyajikan hasil build
+├── requirements.txt
+├── Procfile
+├── runtime.txt
+├── render.yaml                 blueprint Render
+└── frontend/                   Svelte 5 + Vite + Tailwind CSS
     ├── index.html
     ├── package.json
     ├── vite.config.js
-    ├── dist/                   # hasil build (di-commit agar Heroku tinggal jalan)
+    ├── dist/                   hasil build (di-commit)
     └── src/
         ├── main.js
         ├── app.css
-        ├── App.svelte          # halaman utama (form, mode, kontrol langkah)
+        ├── App.svelte
         └── lib/
-            ├── api.js          # pembungkus fetch ke Flask
-            └── components/
-                ├── CaesarViz.svelte
-                ├── VigenereViz.svelte
-                ├── TranspositionViz.svelte
-                ├── PlayfairViz.svelte
-                └── SubstitutionViz.svelte
+            ├── api.js
+            └── components/     CaesarViz, VigenereViz, TranspositionViz,
+                                PlayfairViz, SubstitutionViz
 ```
 
----
+## Menjalankan di lokal
 
-## 🚀 Menjalankan di Lokal
-
-### 1. Backend (Python)
+Backend:
 
 ```bash
 python -m venv .venv
-# Windows:
-.venv\Scripts\activate
-# Linux/macOS:
-source .venv/bin/activate
-
+source .venv/bin/activate        # Linux/macOS
+.venv\Scripts\activate           # Windows
 pip install -r requirements.txt
-python app.py          # jalan di http://127.0.0.1:5000
+python app.py                    # http://127.0.0.1:5000
 ```
 
-### 2. Frontend (Svelte) — mode pengembangan
-
-Buka terminal lain:
+Frontend dalam mode pengembangan (terminal terpisah):
 
 ```bash
 cd frontend
 npm install
-npm run dev            # http://127.0.0.1:5173 (proxy /api ke :5000)
+npm run dev                      # http://127.0.0.1:5173, proxy /api ke :5000
 ```
 
-### 3. Build produksi (satu server)
+Build produksi (satu server):
 
 ```bash
-cd frontend && npm run build     # hasil ke frontend/dist
-cd .. && python app.py           # UI + API di http://127.0.0.1:5000
+cd frontend && npm run build
+cd .. && python app.py
 ```
 
-Cek algoritma tanpa UI:
+Uji algoritma tanpa UI:
 
 ```bash
 python algorithms/_selftest.py
 ```
 
----
-
-## 🔌 API
+## API
 
 | Method | Endpoint | Body | Keterangan |
 |--------|----------|------|------------|
 | GET | `/api/ciphers` | — | daftar cipher + metadata |
 | GET | `/api/<cipher>` | — | info satu cipher |
-| POST | `/api/<cipher>` | `{ "text": "...", "key": "...", "mode": "encrypt"\|"decrypt" }` | hasil + langkah visualisasi |
+| POST | `/api/<cipher>` | `{"text", "key", "mode"}` | hasil + langkah visualisasi |
 
-Contoh:
+`mode` bernilai `"encrypt"` atau `"decrypt"`.
 
 ```bash
 curl -X POST http://127.0.0.1:5000/api/vigenere \
@@ -130,99 +111,59 @@ curl -X POST http://127.0.0.1:5000/api/vigenere \
 {
   "cipher": "vigenere",
   "result": "RUYQLEHVC",
-  "steps": [ { "char": "H", "p_index": 7, "key_char": "K", "k_index": 10, "new_index": 17, "cipher": "R" }, ... ],
-  "tabula_recta": [ ["A","B",...], ... ]
+  "steps": [
+    { "char": "H", "p_index": 7, "key_char": "K", "k_index": 10, "new_index": 17, "cipher": "R" }
+  ],
+  "tabula_recta": [["A", "B", "..."]]
 }
 ```
 
----
+## Deploy
 
-## ☁️ Deploy Gratis (rekomendasi)
+Heroku sudah berbayar sejak November 2022, dan Hugging Face Docker Spaces berbayar sejak
+2025. Opsi yang tetap gratis:
 
-> ⚠️ **Heroku tidak lagi gratis** sejak Nov 2022 — butuh dyno berbayar + kartu kredit.
-> **Hugging Face Docker Spaces juga sudah berbayar** (per 2025). Yang masih gratis:
+### Render (rekomendasi)
 
-### 🥇 Render — Free Web Service
+Repo menyertakan `render.yaml`. Buka <https://dashboard.render.com/blueprints>, pilih
+**New Blueprint Instance**, hubungkan repo `crypto-web`, lalu **Deploy**.
 
-Repo ini sudah punya **`render.yaml`** (Blueprint) → tinggal:
+Cara manual: **New → Web Service**, dengan pengaturan:
 
-1. Buka <https://dashboard.render.com/blueprints>
-2. **New Blueprint Instance** → connect repo GitHub `crypto-web`
-3. Render membaca `render.yaml` (plan `free`, region Singapore) → **Deploy**
-
-Manual juga bisa: **New → Web Service** →
 - Build: `pip install -r requirements.txt`
 - Start: `gunicorn app:app --bind 0.0.0.0:$PORT --workers 2 --timeout 60`
 
-> Free tier Render tidur setelah idle, tapi **bangun otomatis** saat diakses (cold start ±30–60 dtk).
+Free tier Render tertidur saat tidak dipakai, tetapi bangun otomatis ketika diakses
+(cold start sekitar 30–60 detik).
 
-### Alternatif gratis lain
+### Alternatif
 
 | Platform | Catatan |
 |----------|---------|
-| **Railway** | Trial credit, deteksi Procfile otomatis |
-| **Fly.io** | `fly launch` → Python; butuh kartu (tanpa charge selama free allowance) |
-| **Cloudflare Quick Tunnel** | Tanpa akun, tapi URL hanya hidup selama server lokal jalan |
+| Railway | Trial credit, Procfile terdeteksi otomatis |
+| Fly.io | `fly launch`; butuh kartu, tidak ditagih selama masih dalam free allowance |
+| Cloudflare Quick Tunnel | Tanpa akun, tetapi URL hanya aktif selama server lokal berjalan |
 
-Untuk semua platform, pastikan **`frontend/dist` sudah di-build** (sudah di-commit di repo ini).
+Pada semua platform, pastikan `frontend/dist` sudah di-build — buildpack Python tidak
+menjalankan `npm run build`, sehingga hasil build di-commit ke repo.
 
----
+## Catatan algoritma
 
-## ☁️ Deploy ke Heroku (berbayar)
+- **Caesar** — `C = (P + k) mod 26`. Hanya 25 kunci; brute force tersedia saat dekripsi.
+- **Vigenère** — `C = (P + K) mod 26`, kunci diulang. Menghapus pola frekuensi, tetapi
+  dapat dipatahkan dengan Kasiski test bila panjang kunci tertebak.
+- **Columnar Transposition** — huruf tidak diganti, hanya urutannya diacak mengikuti
+  urutan kolom dari kunci. Sel kosong diisi `X`.
+- **Playfair** — substitusi per pasangan huruf melalui matriks 5×5 dari kata kunci
+  (J digabung ke I). Baris sama digeser ke kanan, kolom sama digeser ke bawah, selain itu
+  kolomnya ditukar.
+- **Keyword Substitution** — tabel cipher dibangun dari kata kunci (huruf unik lebih dulu,
+  lalu sisa alfabet). Contoh: `ZEBRA` menjadi `ZEBRACDFGHIJKLMNOPQSTUVWXY`.
 
-Repo ini sudah **Heroku-ready**: `Procfile`, `requirements.txt`, `runtime.txt`, dan
-`frontend/dist` yang sudah di-build.
+Substitusi mengubah identitas huruf; transposisi mengubah urutannya.
 
-```bash
-# butuh Heroku CLI & akun berbayar — LIHAT bagian "Deploy Gratis" di atas
-heroku login
-heroku create nama-app-kamu
+## Teknologi
 
-git init
-git add .
-git commit -m "Crypto Lab: 5 algoritma cipher + visualisasi"
-git push heroku main        # atau: git push heroku master
-
-heroku open
-```
-
-> ⚠️ **Heroku tidak lagi gratis** (sejak Nov 2022). Butuh dyno berbayar + kartu kredit.
-
-### Alternatif gratis (kode sama, tinggal ganti platform)
-
-| Platform | Cara |
-|----------|------|
-| **Render** | New → Web Service → Build: `pip install -r requirements.txt` · Start: `gunicorn app:app` |
-| **Railway** | New Project → Deploy from repo (deteksi otomatis Procfile) |
-| **Fly.io** | `fly launch` → pilih Python; `fly deploy` |
-
-Untuk Render/Railway, pastikan **frontend sudah di-build** (`frontend/dist` ada), karena
-buildpack Python tidak menjalankan `npm run build`.
-
----
-
-## 🧠 Catatan Algoritma
-
-**Caesar** — `C = (P + k) mod 26`. Hanya 25 kunci → lemah; sediakan *brute force* saat dekripsi.
-
-**Vigenère** — `C = (P + K) mod 26`, kunci diulang. Menghancurkan pola frekuensi, tapi bisa
-dipatahkan dengan **Kasiski test** bila panjang kunci tertebak.
-
-**Columnar Transposition** — huruf **tidak diganti**, hanya urutannya diacak mengikuti urutan
-kolom berdasarkan kunci. Sel kosong diisi `X`.
-
-**Playfair** — substitusi **per pasangan huruf** lewat matriks 5×5 dari kata kunci
-(J digabung ke I). Aturan: baris sama → geser kanan; kolom sama → geser bawah; beda keduanya → tukar kolom.
-
-**Keyword Substitution** — tabel cipher dibangun dari kata kunci (huruf unik dulu, lalu sisa
-alfabet). Contoh `ZEBRA` → `ZEBRACDFGHIJKLMNOPQSTUVWXY`.
-
-> **Substitusi** mengubah *identitas* huruf · **Transposisi** mengubah *urutan* huruf.
-
----
-
-## 🛠️ Teknologi
-
-- **Python 3.12** · Flask 3 · flask-cors · gunicorn
-- **Svelte 5** · Vite 8 · Tailwind CSS 4
-- Tanpa dependensi eksternal untuk logika cipher (hanya pustaka standar Python).
+- Python 3.12 · Flask 3 · flask-cors · gunicorn
+- Svelte 5 · Vite 8 · Tailwind CSS 4
+- Logika cipher hanya memakai pustaka standar Python
