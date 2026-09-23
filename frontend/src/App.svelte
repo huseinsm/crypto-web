@@ -6,8 +6,8 @@
   import SubstitutionViz from './lib/components/SubstitutionViz.svelte'
   import { fetchCiphers, runCipher } from './lib/api.js'
 
-  const ICONS = {
-    caesar: '🏛️', vigenere: '🔐', transposition: '🧩', playfair: '⬛', substitution: '🔤'
+  const MONO = {
+    caesar: 'C', vigenere: 'V', transposition: 'T', playfair: 'P', substitution: 'S'
   }
   const ORDER = ['caesar', 'vigenere', 'transposition', 'playfair', 'substitution']
 
@@ -74,140 +74,145 @@
 
 <main class="min-h-screen">
   <!-- HEADER -->
-  <header class="border-b border-slate-800/80 backdrop-blur bg-slate-950/60 sticky top-0 z-20">
-    <div class="max-w-7xl mx-auto px-5 py-4 flex items-center justify-between gap-4">
+  <header class="sticky top-0 z-20 border-b border-line bg-paper/90 backdrop-blur">
+    <div class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between gap-4">
       <div class="flex items-center gap-3">
-        <div class="w-10 h-10 rounded-xl grid place-items-center bg-gradient-to-br from-cyan-400 to-violet-500 text-slate-950 font-black">C</div>
+        <div class="w-9 h-9 grid place-items-center rounded-md bg-ink text-paper font-serif font-semibold text-lg">C</div>
         <div>
-          <h1 class="font-bold text-lg leading-none">Crypto Lab</h1>
-          <p class="text-xs text-slate-400">Visualisasi 5 algoritma cipher klasik</p>
+          <h1 class="font-serif font-semibold text-lg leading-tight">Crypto Lab</h1>
+          <p class="text-[13px] text-ink-3">Visualisasi algoritma cipher klasik</p>
         </div>
       </div>
-      <div class="flex gap-2 text-xs">
-        <span class="px-3 py-1.5 rounded-lg border border-slate-800 text-slate-400">Svelte 5</span>
-        <span class="px-3 py-1.5 rounded-lg border border-slate-800 text-slate-400">Python · Flask</span>
-      </div>
+      <div class="text-[13px] text-ink-3 font-mono">Svelte 5 · Python · Flask</div>
     </div>
   </header>
 
-  <div class="max-w-7xl mx-auto px-5 py-6 grid lg:grid-cols-[260px_1fr] gap-6">
+  <div class="max-w-6xl mx-auto px-6 py-8 grid lg:grid-cols-[240px_1fr] gap-8">
     <!-- SIDEBAR -->
-    <aside class="space-y-2">
-      <div class="text-xs uppercase tracking-widest text-slate-500 px-2 mb-1">Algoritma</div>
-      {#each ORDER as name}
-        {@const m = ciphers[name]}
-        <button onclick={() => selectCipher(name)}
-          class="w-full text-left px-3 py-3 rounded-xl border transition flex items-center gap-3
-          {active === name
-            ? 'border-cyan-400/60 bg-cyan-500/10 shadow-[0_0_20px_-6px_rgba(34,211,238,.5)]'
-            : 'border-slate-800 hover:border-slate-700 hover:bg-slate-900/60'}">
-          <span class="text-xl">{ICONS[name]}</span>
-          <span class="min-w-0">
-            <span class="block font-semibold text-sm truncate">{m?.label ?? name}</span>
-            <span class="block text-[11px] text-slate-400 truncate">{m?.family ?? ''}</span>
-          </span>
-        </button>
-      {/each}
+    <aside>
+      <div class="text-xs uppercase tracking-[0.14em] text-ink-3 font-semibold mb-3 px-1">Algoritma</div>
+      <nav class="space-y-1">
+        {#each ORDER as name}
+          {@const m = ciphers[name]}
+          <button onclick={() => selectCipher(name)}
+            class="w-full text-left px-3 py-2.5 rounded-lg border transition flex items-center gap-3
+            {active === name
+              ? 'bg-surface border-line-strong shadow-sm'
+              : 'border-transparent hover:bg-surface/70'}">
+            <span class="w-7 h-7 grid place-items-center rounded-md border font-serif font-semibold text-[13px] shrink-0
+              {active === name ? 'bg-brand text-white border-brand' : 'bg-paper text-ink-2 border-line'}">{MONO[name]}</span>
+            <span class="min-w-0">
+              <span class="block text-sm font-medium truncate {active === name ? 'text-ink' : 'text-ink-2'}">{m?.label ?? name}</span>
+              <span class="block text-[11px] text-ink-3 truncate">{m?.family ?? ''}</span>
+            </span>
+          </button>
+        {/each}
+      </nav>
 
-      <div class="mt-4 p-3 rounded-xl border border-slate-800 bg-slate-900/40 text-[11px] leading-relaxed text-slate-400">
-        <b class="text-slate-300">Substitusi</b> mengganti <i>identitas</i> huruf.
-        <b class="text-slate-300">Transposisi</b> mengubah <i>urutan</i> huruf.
+      <div class="mt-6 p-3.5 rounded-lg border border-line bg-surface text-[12px] leading-relaxed text-ink-2">
+        <b class="text-ink">Substitusi</b> mengganti identitas huruf,
+        <b class="text-ink">transposisi</b> mengubah urutannya.
       </div>
     </aside>
 
     <!-- KONTEN -->
-    <section class="space-y-6 min-w-0">
+    <section class="space-y-5 min-w-0">
       <!-- info cipher -->
-      <div class="rounded-2xl border border-slate-800 bg-slate-900/40 p-5 slideup" key={active}>
-        <div class="flex items-start gap-3">
-          <span class="text-2xl">{ICONS[active]}</span>
-          <div>
-            <h2 class="text-xl font-bold">{meta.label}</h2>
-            <p class="text-xs text-cyan-400/80 uppercase tracking-widest">{meta.family}</p>
-            <p class="text-sm text-slate-300 mt-2">{meta.desc}</p>
-          </div>
+      <div class="rounded-xl border border-line bg-surface p-5 fadeup" key={active}>
+        <div class="flex items-baseline gap-3 flex-wrap">
+          <h2 class="font-serif text-2xl font-semibold text-ink">{meta.label}</h2>
+          <span class="text-[11px] uppercase tracking-[0.14em] text-brand font-semibold">{meta.family}</span>
         </div>
+        <p class="text-sm text-ink-2 mt-2 leading-relaxed">{meta.desc}</p>
       </div>
 
       <!-- form -->
-      <div class="rounded-2xl border border-slate-800 bg-slate-900/40 p-5 space-y-4">
-        <div class="grid md:grid-cols-[1fr_220px] gap-4">
+      <div class="rounded-xl border border-line bg-surface p-5 space-y-4">
+        <div class="grid md:grid-cols-[1fr_200px] gap-4">
           <label class="block">
-            <span class="text-xs uppercase tracking-widest text-slate-400">Teks masukan</span>
+            <span class="text-xs font-semibold uppercase tracking-[0.12em] text-ink-3">Teks masukan</span>
             <textarea bind:value={text} rows="3"
-              class="mt-1.5 w-full rounded-xl bg-slate-950/70 border border-slate-800 focus:border-cyan-400/60 focus:outline-none p-3 font-mono text-sm resize-y"
+              class="mt-2 w-full rounded-lg bg-paper border border-line focus:border-brand focus:ring-2 focus:ring-brand/15 focus:outline-none p-3 font-mono text-sm resize-y text-ink"
               placeholder="Tulis teks di sini..."></textarea>
           </label>
           <label class="block">
-            <span class="text-xs uppercase tracking-widest text-slate-400">{meta.key_label}</span>
+            <span class="text-xs font-semibold uppercase tracking-[0.12em] text-ink-3">{meta.key_label}</span>
             {#if meta.key_type === 'number'}
               <input type="number" min="0" max="25" bind:value={key}
-                class="mt-1.5 w-full rounded-xl bg-slate-950/70 border border-slate-800 focus:border-cyan-400/60 focus:outline-none p-3 font-mono text-sm" />
-              <span class="text-[11px] text-slate-500">0–25</span>
+                class="mt-2 w-full rounded-lg bg-paper border border-line focus:border-brand focus:ring-2 focus:ring-brand/15 focus:outline-none p-3 font-mono text-sm text-ink" />
+              <span class="text-[11px] text-ink-3 mt-1 block">0–25</span>
             {:else}
               <input type="text" bind:value={key}
-                class="mt-1.5 w-full rounded-xl bg-slate-950/70 border border-slate-800 focus:border-cyan-400/60 focus:outline-none p-3 font-mono text-sm uppercase tracking-widest" />
-              <span class="text-[11px] text-slate-500">huruf saja</span>
+                class="mt-2 w-full rounded-lg bg-paper border border-line focus:border-brand focus:ring-2 focus:ring-brand/15 focus:outline-none p-3 font-mono text-sm uppercase tracking-widest text-ink" />
+              <span class="text-[11px] text-ink-3 mt-1 block">huruf saja</span>
             {/if}
           </label>
         </div>
 
         <div class="flex flex-wrap items-center gap-3">
-          <div class="inline-flex rounded-xl border border-slate-800 overflow-hidden">
+          <div class="inline-flex rounded-lg border border-line overflow-hidden bg-paper">
             <button onclick={() => switchMode('encrypt')}
-              class="px-4 py-2 text-sm font-medium {mode === 'encrypt' ? 'bg-cyan-500/20 text-cyan-200' : 'text-slate-400 hover:bg-slate-800/60'}">🔒 Enkripsi</button>
+              class="px-4 py-2 text-sm font-medium transition
+              {mode === 'encrypt' ? 'bg-ink text-paper' : 'text-ink-2 hover:text-ink'}">Enkripsi</button>
             <button onclick={() => switchMode('decrypt')}
-              class="px-4 py-2 text-sm font-medium border-l border-slate-800 {mode === 'decrypt' ? 'bg-violet-500/20 text-violet-200' : 'text-slate-400 hover:bg-slate-800/60'}">🔓 Dekripsi</button>
+              class="px-4 py-2 text-sm font-medium transition border-l border-line
+              {mode === 'decrypt' ? 'bg-ink text-paper' : 'text-ink-2 hover:text-ink'}">Dekripsi</button>
           </div>
           <button onclick={run} disabled={loading}
-            class="px-6 py-2.5 rounded-xl font-semibold text-slate-950 bg-gradient-to-r from-cyan-400 to-cyan-300 hover:from-cyan-300 hover:to-cyan-200 disabled:opacity-50 transition">
-            {loading ? 'Memproses…' : 'Jalankan ⚡'}
+            class="px-6 py-2.5 rounded-lg font-semibold text-sm text-white bg-brand hover:bg-brand-deep disabled:opacity-50 transition">
+            {loading ? 'Memproses…' : 'Jalankan'}
           </button>
         </div>
 
         {#if error}
-          <div class="text-sm text-rose-300 bg-rose-500/10 border border-rose-500/30 rounded-xl px-4 py-3">
-            ⚠ {error}
+          <div class="text-sm text-danger bg-danger-soft border border-danger/25 rounded-lg px-4 py-3">
+            {error}
           </div>
         {/if}
       </div>
 
       <!-- HASIL -->
       {#if result}
-        <div class="rounded-2xl border border-cyan-500/30 bg-gradient-to-b from-cyan-500/5 to-transparent p-5 slideup">
-          <div class="text-xs uppercase tracking-widest text-cyan-400/80 mb-2">Hasil</div>
-          <div class="font-mono text-xl break-all text-amber-200 selection:bg-amber-400/30">{result.result}</div>
-          <div class="mt-2 text-xs text-slate-500 font-mono">
+        <div class="rounded-xl border border-line bg-surface p-5 fadeup">
+          <div class="text-xs uppercase tracking-[0.14em] text-ink-3 font-semibold mb-3">Hasil</div>
+          <div class="font-mono text-xl break-all text-ink leading-snug">{result.result}</div>
+          <div class="mt-2 text-xs text-ink-3 font-mono">
             masukan bersih: {result.input_clean} ({result.input_clean.length} huruf)
           </div>
         </div>
 
         <!-- KONTROL LANGKAH -->
         {#if totalSteps > 0}
-          <div class="rounded-2xl border border-slate-800 bg-slate-900/40 p-4">
+          <div class="rounded-xl border border-line bg-surface p-4">
             <div class="flex flex-wrap items-center gap-3">
-              <span class="text-xs uppercase tracking-widest text-slate-400">Visualisasi langkah</span>
-              <div class="flex items-center gap-2 ml-auto">
-                <button onclick={prev} class="px-3 py-1.5 rounded-lg border border-slate-700 hover:bg-slate-800 text-sm">◀</button>
+              <span class="text-xs uppercase tracking-[0.14em] text-ink-3 font-semibold">Langkah</span>
+              <div class="flex items-center gap-1.5 ml-auto">
+                <button onclick={prev} aria-label="Sebelumnya" class="p-2 rounded-md border border-line text-ink-2 hover:bg-paper hover:text-ink transition">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+                </button>
                 {#if playing}
-                  <button onclick={stopPlay} class="px-3 py-1.5 rounded-lg border border-slate-700 hover:bg-slate-800 text-sm">⏸</button>
+                  <button onclick={stopPlay} aria-label="Jeda" class="p-2 rounded-md border border-line text-ink-2 hover:bg-paper hover:text-ink transition">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg>
+                  </button>
                 {:else}
-                  <button onclick={play} class="px-3 py-1.5 rounded-lg border border-slate-700 hover:bg-slate-800 text-sm">▶ Play</button>
+                  <button onclick={play} class="px-3 py-2 rounded-md border border-line text-[13px] font-medium text-ink-2 hover:bg-paper hover:text-ink transition">Putar</button>
                 {/if}
-                <button onclick={next} class="px-3 py-1.5 rounded-lg border border-slate-700 hover:bg-slate-800 text-sm">▶</button>
-                <button onclick={showAll} class="px-3 py-1.5 rounded-lg border border-slate-700 hover:bg-slate-800 text-sm">Semua</button>
+                <button onclick={next} aria-label="Berikutnya" class="p-2 rounded-md border border-line text-ink-2 hover:bg-paper hover:text-ink transition">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg>
+                </button>
+                <button onclick={showAll} class="px-3 py-2 rounded-md border border-line text-[13px] font-medium text-ink-2 hover:bg-paper hover:text-ink transition">Semua</button>
               </div>
             </div>
             <input type="range" min="0" max={Math.max(totalSteps - 1, 0)} value={step < 0 ? totalSteps - 1 : step}
               oninput={(e) => { stopPlay(); step = +e.currentTarget.value }}
-              class="w-full mt-3 accent-cyan-400" />
-            <div class="text-[11px] text-slate-500 font-mono">
+              class="w-full mt-3 accent-brand" />
+            <div class="text-[11px] text-ink-3 font-mono mt-1">
               langkah {(step < 0 ? totalSteps : step + 1)} / {totalSteps}
             </div>
           </div>
 
           <!-- VISUALISASI per tipe -->
-          <div class="rounded-2xl border border-slate-800 bg-slate-900/40 p-5">
+          <div class="rounded-xl border border-line bg-surface p-5">
             {#if active === 'caesar'}
               <CaesarViz data={result} {step} />
             {:else if active === 'vigenere'}
@@ -223,8 +228,8 @@
         {/if}
       {/if}
 
-      <footer class="text-center text-xs text-slate-600 pt-4 pb-8">
-        Crypto Lab · Caesar · Vigenère · Columnar Transposition · Playfair · Keyword Substitution — logika di Python, tampilan di Svelte 5.
+      <footer class="text-center text-xs text-ink-3 pt-2 pb-6">
+        Caesar · Vigenère · Columnar Transposition · Playfair · Keyword Substitution — logika di Python, antarmuka di Svelte 5.
       </footer>
     </section>
   </div>
