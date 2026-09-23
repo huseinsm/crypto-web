@@ -1,0 +1,15 @@
+__pycache__/
+*.pyc
+.venv/
+venv/
+*.log
+
+# frontend
+frontend/node_modules/
+# frontend/dist/  <-- SENGAJA di-commit (hasil build dipakai Heroku Python buildpack)
+
+# build output (di-serve Flask, boleh di-commit untuk Heroku; abaikan bila CI build)
+# build/
+
+.DS_Store
+.env
