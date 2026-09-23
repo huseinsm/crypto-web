@@ -1,0 +1,23 @@
+# Normalisasi akhir baris — wajib untuk Heroku
+* text=auto
+
+# File yang HARUS LF (Heroku menolak CRLF pada file ini)
+Procfile text eol=lf
+*.sh text eol=lf
+runtime.txt text eol=lf
+requirements.txt text eol=lf
+
+# Kode Python & web
+*.py text eol=lf
+*.js text eol=lf
+*.mjs text eol=lf
+*.svelte text eol=lf
+*.css text eol=lf
+*.html text eol=lf
+*.json text eol=lf
+*.md text eol=lf
+
+# Biner
+*.png binary
+*.jpg binary
+*.woff2 binary
